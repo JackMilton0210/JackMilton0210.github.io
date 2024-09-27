@@ -2,6 +2,7 @@
 <html>
 <body>
 <h1>Jack Milton</h1>
-<p>Games Programmer </p>
+<h2>Games Programmer</h2>
+<p>Games programmer with strong math skills and a keen eye for detail. Hard-working team member with resounding experience working in small groups in both education and workplace environments. </p>
 </body>
 </html>
