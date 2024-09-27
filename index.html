@@ -1,15 +1,77 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href = "style.css">
 <html>
-<body>
 
-<h2>Jack Milton</h2>
-<h1>Games Programmer</h1>
-<p>Games programmer with strong math skills and a keen eye for detail. Hard-working team member with resounding experience working in small groups in both education and workplace environments. </p>
+    <head> </head>
+    
+    <body>
+    
+        <div class="Container Light">
+            <div class = "Title">
+                <div class = "Left">
+                    <h1>Jack Milton</h1>
+                    <h2>Games Programmer</h2>
+                </div>
+                <div class = "Left Subtitle">
+                    <p>Games programmer with strong math skills and a keen eye for detail. Hard-working team member with resounding experience working in small groups in both education and workplace environments.</p>
+                </div>
+            </div>
+        </div>
 
-<h2>Beat 'Em Mop</h2>
-<a href="https://goldenlantergames.itch.io/beat-em-mop">Itch Page</a>
-<p>Beat Em Mop is a 2D arcade style fighting game where you play as the janitor who has had enough of his job and decides to take out his rage on the co-workers around him all while keeping the place spotless.
-Beat 'Em Mop was developed as part of a 7-person group project over the course of 4 months. I was the game's programmer and was responsible for coding, implementing assets and managing source control.</p>
-</body>
+        <div class = "Container Navigation">
+        <nav>
+                    <a href = "#top"><div class = "Item Left">Home</div></a>
+                    <a href = "#portfolio"><div class = "Item Left">Portfolio</div></a>
+           
+        </nav>
+        </div>
+
+        <section id = "portfolio">
+            <div class="Container Light">
+                <div class = "Subtitle">
+                    <hr>
+                    <h1>Portfolio</h1>
+                </div>
+    
+                <a href = "https://goldenlantergames.itch.io/beat-em-mop">
+                    <div class = "Project">
+                        <h2>Beat 'Em Mop</h2>
+                        <h3>January - April 2024</h3>
+                        <hr>
+                        <div class = "Row">
+                            <div class = "Left"><img src="img/BeatEmMop_Cover.png" alt="Cover Image" class = "image"></div>
+                            <div class = "Right"><p>Beat Em Mop is a 2D arcade style fighting game where you play as the janitor who has had enough of his
+                            job and decides to take out his rage on the co-workers around him all while keeping the place spotless.</p>
+                            <p>Beat 'Em Mop was developed as part of a 7-person group project over the course of 4 months. I was the
+                            game's programmer and was responsible for coding, implementing assets and managing source control.</p></div>                    
+                        </div>
+                        <hr>
+                        <div class = "Row">
+                            <div class = "Left">
+                                <p>The biggest challenge through the project was the combat system.</p>
+                                <p>
+                                The earliest implementation saw the player simply damage enemies if they were standing in front of him.
+                                This was sufficient for the beginning stages of development.</p>
+                                <p>Once the first pass animations were implemented, a key frame system was developed such that the attack hitbox could be repositioned and resized for each frame.
+                                The hitboxes were then mapped to match the weapon perfectly.</p>
+                                <p>However after the final versions of the animations were developed, it became apperent that this could be improved.
+                                The keyframes were extended farther to provide a more fun and fluid feeling.
+                                </p>
+                            </div>                    
+                            <div class = "Right"><img src="img/BeatEmMop_Attack.png" alt="Cover Image" class = "image"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+    </section>
+
+    <section id ="contact">
+        <div class = "Container">
+            
+        </div>
+    </section>
+        
+    </body>
+        
 </html>
