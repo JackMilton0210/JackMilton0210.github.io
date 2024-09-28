@@ -1,14 +1,31 @@
 :root{
-    --schemeA-color1: rgb(209, 205, 211);
-    --schemeA-color2: rgb(248, 248, 248);
-    /*--scehemA-color2: white;*/
-    --schemeA-color3: rgb(199, 198, 198);
-    --schemeA-color4: rgb(58, 58, 58);
+    --color1a: white;
+    --color1b: rgb(240, 239, 239);
+    --color1c: rgb(235, 224, 224);    
+    --color1d: rgb(58, 58, 58);
 }
+
+.Title h1{
+    width: 75%;
+    margin-left:auto;
+    text-align: right;
+}
+.Title h2{
+    width: 75%;
+    margin-left:auto;
+    text-align: right;
+}
+.Title p{
+    width: 75%;
+    margin-right:auto;
+    text-align:left;
+    padding-left: 50px;
+}
+
 body{
-    font-family:'Arial Narrow';
+    
+    font-family:'Helvetica';
     color: black;
-    background-color: white;
 }
 a{
     color:black;
@@ -47,34 +64,28 @@ img{
     width: 45%;
     float:right;
 }
-
-.Light{
-    background-color: var(--schemeA-color2);
-}
-.Dark{
-    background-color: var(--schemeA-color3);
-}
 .Navigation{
-    background-color: white;
     position:fixed;
     top: 0;
     left: 0;
     right: 0;
     margin: auto;
+    background-color: var(--color1a);
+    box-shadow: 0px 5px 20px black;
+    padding-left: 50px;
 }
 .Item{
-    padding-top: 10px;
-    margin: 10px;
-    border-radius: 5px;
-    width: 200px;
+    
+    padding: 20px 20px 10px 20px;
+    margin-right: 0px;
+    width: auto;
     height: 50px;
-    text-align:center;
+    text-align:left;
     font-size:xx-large;
-    transition-duration: 26;
+    transition-duration: 250ms;
 }
 .Item:hover {
-    background-color: var(--schemeA-color4);
-    
+    background-color: var(--color1c);
 }
 
 .Break{
@@ -90,8 +101,8 @@ img{
     padding: 40px;
     border-radius: 15px;
     margin-bottom: 200px;
-    background-color: var(--schemeA-color3);
-    box-shadow: 0px 0px 10px black;
+    background-color: var(--color1b);
+    box-shadow: 0px 0px 10px var(--color1c);
 }
 
 .Project h1{
@@ -105,7 +116,6 @@ img{
     margin-bottom: 20px;
     margin-top: 20px;
     overflow: auto;
-    
 }
 
 .Date{
@@ -115,4 +125,21 @@ img{
 .Honours{
     margin: auto;
     width: 80%;
+}
+.link-img{
+    max-width: 100px;
+    padding: 10px;
+}
+.Project a p{
+    text-decoration: underline;
+}
+
+.OutLink{
+    width:fit-content;
+    height: auto;
+    border-radius: 5px;
+    text-align: left;
+}
+.OutLink:hover{
+    background-color:var(--color1c);
 }
