@@ -1,0 +1,544 @@
+//---------------SETUP----------------//
+
+
+//-----LIBRARIES-----//
+  #include <Streaming.h>          //include the streaming library
+  #include <TM1638plus.h>         //include expansion board library
+
+  
+
+
+//Port Assignments
+  
+  int rotary = A0;                //Rotary Encoder to Port A0
+  
+  int redLED = D0;                //Red LED to Port D0
+  int greenLED = D1;              //Green LED to Port D1
+  int blueLED = D2;               //Blue LED to Port D2
+  int yellowLED = D3;             //Yellow LED to Port D3
+
+  #define strobe D4               //TM1628 Strobe to Port D4
+  #define clock D5                //TM1628 Clock to Port D5
+  #define data D6                 //TM1628 Data to Port D6
+
+  int buzzer = D7;                //Buzzer to Port D7
+  int button = D8;                //Button to Port D8          
+  
+
+
+//-----TM1628 SETUP-----//
+  bool high_freq = false;                           //Not using a high frequency CPU
+  TM1638plus tm(strobe, clock , data, high_freq);   //Allows use of "tm." to use expansion board functions
+                                                    //...and assign strobe,clock,data,high_freq
+  byte buttons;
+
+  //Expansion board LED Addresses
+  int led[8] = {193, 195, 197, 199, 201, 203, 205, 207};
+
+
+
+
+//-----ROTARY ENCODER SETUP-----//
+                    
+  float difficulty = 0;             //Difficulty variable
+  float rotaryMaximum = 1024.00;    //Maximum value that the rotary encoder will output
+  float currentRotaryValue = 0;     //What value the rotary encoder is (will be updated using loop)
+  int rotaryLimit[8] = {0};         //At what point each expansion LED should light
+
+
+  
+
+//-----MAIN BOARD SETUP-----//
+  
+  //musical notes - these are the frequencies(hertz) of notes A-G (around middle C)
+  float noteA1 = 220.00;
+  float noteB1 = 246.94;
+  float noteC1 = 261.63;
+  float noteD1 = 293.66;
+  float noteE1 = 329.63;
+  float noteF1 = 349.23;
+  float noteG1 = 392.00;
+  
+  //musical notes - A-G after the first set
+  float noteA2 = 440.00;
+  float noteB2 = 493.88;
+  float noteC2 = 523.25;
+  float noteD2 = 587.33;
+  float noteE2 = 659.25;
+  float noteF2 = 698.46;
+  float noteG2 = 783.99;
+
+  //Array with notes A-G in positions 0-7
+  float note[8] = {noteA1,noteB1,noteC1,noteD1,noteE1,noteF1,noteG1};
+
+  //Assign a Note to Each Coloured LED
+  float redNote = noteA2;
+  float greenNote = noteB2;
+  float blueNote = noteC2;
+  float yellowNote = noteD2;
+
+  //Note that plays when player gets an input wrong
+  float failNote = 111;
+
+  //Score and Highscore variables
+  int score = 0;
+  int highscore = 0;
+
+  
+
+
+
+
+
+
+//---------------FUNCTIONS--------------//
+
+  //-----LED and Buzzer Functions-----//
+  
+  
+  
+  //Turn ON the specified LED
+  void turnOn(int colour){
+    digitalWrite(colour, HIGH);
+  }
+
+  
+  //Turn OFF the specifiec LED
+  void turnOff(int colour){
+    digitalWrite(colour, LOW);
+  }  
+
+    
+  //Light Specified LED, Ring Buzzer, delay, then turn both off again
+  
+  void red(int timeDelay){
+    turnOn(redLED);               //Turn on the red LED
+    tone(buzzer, redNote);        //turn on the buzzer at the frequency redNote
+    delay(timeDelay);             //Delay for timeDelay (based on difficulty)
+    noTone(buzzer);               //turn off buzzer
+    turnOff(redLED);              //turn off red LED
+  }
+
+  void green(int timeDelay){
+    turnOn(greenLED);             //Turn on the green LED
+    tone(buzzer, greenNote);      //turn on the buzzer at the frequency greenNote
+    delay(timeDelay);             //Delay for timeDelay
+    noTone(buzzer);               //turn off the buzzer
+    turnOff(greenLED);            //turn off the green LED
+  }
+
+  void blue(int timeDelay){
+    turnOn(blueLED);              //turn on the blue LED
+    tone(buzzer, blueNote);       //turn on the buzzer at the frequency blueNote
+    delay(timeDelay);             //delay for timeDelay (based on difficulty)
+    noTone(buzzer);               //turn off the buzzer
+    turnOff(blueLED);             //turn off the blue LED
+  }
+
+  void yellow(int timeDelay){
+    turnOn(yellowLED);            //turn on the yellow LED
+    tone(buzzer,yellowNote);      //turn on the buzzer at frequency yellowNote
+    delay(timeDelay);             //delay for timeDelay (based on difficulty)
+    noTone(buzzer);               //turn off buzzer
+    turnOff(yellowLED);           //turn off yellow LED
+  }
+
+
+  
+
+//-----Expansion Board Functions-----//
+
+//Sends byte value to an address on the expansion board
+void expansion(byte address, byte value){
+  digitalWrite(strobe,LOW);                       //Shift Register Off
+  shiftOut(data, clock, LSBFIRST, address);       //Specify Address
+  shiftOut(data, clock, LSBFIRST, value);         //Send Data
+  digitalWrite(strobe,HIGH);                      //Shift Register On
+  
+}
+
+//Light the specified expansion board LED
+void expLight(int address, bool lit){
+  //Use the expansion function to send the high signal to the correct address
+  expansion(address, lit);              
+}
+
+
+
+
+//-----Rotary Encoder & Difficulty Functions-----//
+
+//Reverse currentRotaryValue to flip rotary encoders directions
+int reverse(int rotary){
+  //reverse rotary encoder direction
+  return (rotaryMaximum-currentRotaryValue)+(rotaryMaximum/16);
+}
+
+//Checks currentRotary value against the LEDs threshold
+void rotaryCheck(int currentRotaryPosition, int i){
+
+  if (currentRotaryPosition>rotaryLimit[i]){
+    expLight(led[i],1); 
+  }
+  else{
+    expLight(led[i],0);
+  }
+}
+
+
+
+//Determine timeDelay based on difficulty (reversely proportional)
+float calculateTimeDelay(int difficultyInt){
+    //Calculate -  Difficulty + 1
+    float diff1 = difficultyInt+1;
+
+    //Calculate -  1/(Difficulty+1)
+    float invDiff = 1/diff1;
+    
+    //Calculate - (1/Difficulty+1))*1000
+    float timeDelay = invDiff*1000;
+    
+    return timeDelay;
+}
+
+
+
+//---------------FUNCTION READBUTTONS---------------//
+
+  //Function return an integer from 0-255 that contains the state of the Expansion Board buttons
+  //From left to right 1,2,4,8,16,32,64,128,
+  //i.e. 
+  //Where 1 is the leftmost button and 8 is the rightmost button
+  //  1   2   3   4   5   6   7   8   Function returns
+  //  0   0   0   0   0   0   0   0                  0
+  //  1   0   0   0   0   0   0   0                  1
+  //  0   1   0   0   0   0   0   0                  2
+  //  .............................                ...
+  //  1   0   1   0   1   1   1   0                117
+  //  .............................                ...
+  //  1   1   1   1   1   1   1   1                255
+  
+  int readButtons(){
+  
+    int buttons = 0;                                    //Declare expanion board buttons
+  
+    digitalWrite(strobe,LOW);                           //Shift Register OFF
+    shiftOut(data, clock, LSBFIRST, 0x42);              //Send signal to read buttons
+    pinMode(data, INPUT);                               //change pinmode to input
+
+    for (uint8_t i=0; i<4; i++){                        //for each bit
+      uint8_t v = shiftIn(data, clock, LSBFIRST) << i;  //check the status of each button
+      buttons |= v;                                     //or the results together to create the button integer
+    }
+
+    pinMode(data, OUTPUT);                              //Set the pinmode back to output
+    digitalWrite(strobe, HIGH);                         //Shift Register ON
+    return buttons;                                     //Function returns the state of the 8 buttons
+  
+  } 
+
+
+  //Convert the 1,2,4,6 value to corresponding 1,2,3,4 to allow comparison to runLog
+  int convert(int buttons){
+        switch(buttons){
+          case 1: return 1 ; break;
+          case 2: return 2 ; break;
+          case 4: return 3 ; break;
+          case 8: return 4 ; break;
+        }
+  }
+
+
+  //Sequence to play when the player gets input wrong
+  void gameOverLights(){
+
+    for (int i = 255; i >0; i--){       //Deplete LEDs from max (255) to off (0) over ~2 seconds
+      analogWrite(redLED, i);
+      analogWrite(greenLED, i);
+      analogWrite(blueLED, i);
+      analogWrite(yellowLED, i);
+      tone(buzzer,(2*i)+100);           //Play decreasing frequency on buzzer (610hz -> 100hz)
+      delay(1/(i+1));
+    }
+
+    turnOff(redLED);                    //Turn OFF all four LEDs
+    turnOff(greenLED);     
+    turnOff(blueLED);      
+    turnOff(yellowLED);
+
+    noTone(buzzer);                     //Turn OFF buzzer
+
+  
+  }
+
+
+//----------Void setup----------//
+
+void setup() {
+
+
+
+
+tm.displayBegin();
+Serial.begin(115200);
+  //-----Main Board-----//
+  pinMode(button, INPUT_PULLUP);    //Declare button as an input
+  
+  pinMode(redLED, OUTPUT);          //Declare red LED as an output
+  pinMode(greenLED, OUTPUT);        //Declare green LED as an output
+  pinMode(blueLED, OUTPUT);         //Declare blue LED as an output
+  pinMode(yellowLED, OUTPUT);       //Declare yellow LED as an output
+  
+  pinMode(strobe, OUTPUT);          //Declare Expansion board strobe as an output
+  pinMode(clock, OUTPUT);           //Declare Expansion board clock as an output
+  pinMode(data, OUTPUT);            //Declare Expansion board data as an output
+ 
+  
+
+  //Find the threshold for each expansion board LED
+  for(int i=0; i<8; i++){
+    //for each LED, divide the maximum possible value for the rotary encoder...
+    //...and divide it by 8, multiply it by the LEDs number + 1, then subtract 1
+    rotaryLimit[i] = ((i+1)*(rotaryMaximum/8))-1;
+  }
+
+    
+
+Serial <<endl << "Setup Complete";
+
+}//End of Void Setup
+
+
+
+
+
+
+//----------Void loop----------//
+
+void loop(){
+  
+//---------------PREP PHASE---------------//
+//Prep Phase Occurs Once per Playthrough, NOT every loop
+
+   
+  
+  //----------SETTING DIFFICULTY----------//
+
+  //Find the current position of the rotary encoder
+  currentRotaryValue = analogRead(rotary);
+  
+  //Reverse currentRotaryValue to flip direction of rotary encoder
+  currentRotaryValue = reverse(currentRotaryValue);
+  
+  
+  //Program will loop until the button is pushed
+  if(digitalRead(button)==0){
+    
+    //check whether or not each light should be lit by...
+    //...comparing the current position of the rotary encoder to each lights threshold
+    for (int i = 0; i < 8; i++){
+        rotaryCheck(currentRotaryValue, i);                
+    }
+  }
+
+  
+  
+  //----------CALCULATING  TIME DELAY----------//
+
+  //When the button is pressed the else statement is triggered
+  //The difficulty is set and the rotary encoder is no longer required to function as an input
+  else{
+
+    //Difficulty is set when the button is pressed
+    //stop taking input from rotary encoder and lock expansion LEDs to show the difficulty
+    
+    difficulty = (currentRotaryValue/rotaryMaximum)*8;  //calculate the difficulty
+    int difficultyInt = (int)(difficulty);
+    Serial << endl << "Difficulty Selected:\t" << difficultyInt;
+
+    //Turn off all Expansion board LEDs once the difficulty is selected
+    for(int i=0; i < 8;i++){
+      expLight(led[i],0);
+    }
+    
+
+    //Determine timeDelay based on difficulty
+    float timeDelay = calculateTimeDelay(difficultyInt);
+
+
+  
+    //Page break before run starts
+    Serial << endl <<endl;
+
+    //Number to colour key will display before the loop starts
+    Serial << "1 - Red, 2 - Green, 3 - Blue, 4 - Yellow,";
+    
+    //Create Variables used in the run throughs
+    int runLog[100] = {0};
+    int runLength = 0;
+    int newNum = 0;
+    bool correct = 1;
+    
+    
+    
+//---------------PREP PHASE END---------------//    
+    
+
+
+  //---------------PLAY PHASE---------------//
+  //The game will play an increasingly large sequence of LEDs flashing
+  //The player must remember the order the LEDs flashed in and input the same order
+
+
+  
+    //Run the Program for as long as the player gets the sequence right
+    while (correct == 1){
+
+      //---------------UPDATE---------------//
+
+      
+      //Update 7-Seg Display
+
+        //Display the players score on the 7-Seg LED - provided the score is higher than 0
+        if(runLength>0){
+          tm.displayIntNum(runLength,false);
+        }
+        //is the score is 0 then wipe the 7 seg
+        else{
+          tm.reset();
+        }
+      
+      
+      //Add to the sequence runLog, which tracks the LED lighting order
+      
+        //random number from 1-4
+        newNum = rand()%4+1;
+      
+        //Add newNum to runLog array in the position off size runLength
+        runLog[runLength] = newNum;
+         
+        //Print Each Assigned runLog
+        Serial << endl << "runLog[" << runLength << "] = " << runLog[runLength];      
+      
+        //Add 1 to run length
+        runLength = runLength + 1;
+
+
+
+      //---------------DEMO PHASE---------------//
+    
+      //Run the sequence
+
+        //Turn off expansion board LEDs
+        for(int i=0; i < 8;i++){
+          expLight(led[i],0);
+        }
+
+        //Delay after pressing the start button before LEDs start Lighting
+       delay(500);
+
+        
+        //Light the sequence from runLog[0] to runLog[runLength]
+        for(int i = 0; i<runLength; i++){
+          
+          //Small Time gap between light ups
+          delay(timeDelay);
+        
+          //Use the position of runLog to determine which colour should be shown
+          switch(runLog[i]){
+            case 1: red(timeDelay);break;
+            case 2: green(timeDelay);break;
+            case 3: blue(timeDelay);break;
+            case 4: yellow(timeDelay);break;
+          }//end of switch
+          
+        }//end of for loop
+
+        
+      //----------PLAY PHASE----------//
+
+      //Player must input the same pattern or the game will end
+
+      //Display "Waiting for Input"
+      Serial << endl << "Waiting for Input";              
+
+      //Turn on expansion board LEDs
+        for(int i=0; i < 8;i++){
+          expLight(led[i],1);
+        }
+
+      //For the number of lights currently in the sequence
+      for(int i = 0; i < runLength; i++){
+
+        //Reset buttons
+        buttons = 0;                                      
+        
+        
+        while((readButtons()==0)||(readButtons()>8)){     //When button is pressed
+          int buttons = readButtons();                    //get the state of each button
+          delay(1);
+          //Serial << endl << "Buttons:\t" << buttons;     //Display buttons
+
+        }
+
+
+        //When player presses a button
+        int buttons = readButtons();            //set buttons variable to current state of buttons
+        int input = convert(buttons);           //convert player input into 1-4 range to compare to runLog
+        buttons = 0;                            //reset buttons to 0
+        
+        Serial << endl;                         //Page Break
+        Serial << endl << "Input: " << input;   //Send Input to Serial Comms
+             
+        
+        //Check if the players input is correct
+        if(input == runLog[i]){                 //If input is equal to runLog[i]
+          Serial <<endl<<"correct";             //Display "Correct"
+
+          switch(input){                        //Light correct LED
+            case 1: red(timeDelay);break;
+            case 2: green(timeDelay);break;
+            case 3: blue(timeDelay);break;
+            case 4: yellow(timeDelay);break;
+          }          
+        }                                             
+        else{                                   //If input is NOT equal to runLog[i]
+          Serial <<endl<<"wrong";               //Display "Wrong"
+          correct = 0;
+        }
+
+        input = 0;                              //Reset input
+      
+      }                                         //end of input for loop
+    
+    }                                           //end of while(correct==1)
+
+
+
+
+
+    //----------GAME OVER----------//
+    //When Player gets an input wrong
+    Serial << endl << endl << "Game Over";
+
+    //turn on LEDs and buzzer, delay, turn off LEDs and buzzer
+    gameOverLights();               
+
+    
+    //SCORE & HIGHSCORE
+      //Set score to runLength
+      int score = runLength - 1;
+  
+      //If current score is higher than highscore then update highscore
+      if(score>highscore){
+      highscore = score;
+      Serial << endl << "New Highscore!";
+      }
+
+      //Display Score and Highscore
+      Serial << endl << "Score:\t\t" << score;
+      Serial << endl << "Highscore:\t" << highscore;
+    
+    
+    } //end of else
+} //end of void loop

@@ -133,6 +133,9 @@ img{
 .Project a p{
     text-decoration: underline;
 }
+p a{
+    text-decoration: underline;
+}
 
 .OutLink{
     width:fit-content;

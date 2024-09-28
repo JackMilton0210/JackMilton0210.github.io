@@ -46,45 +46,108 @@
 
         <section id = "portfolio">
             <div class="Container">
+
+                <!--TITLE-->
                 <div class = "Subtitle">
                     <h1>Portfolio</h1>
                 </div>
     
                 
-                    <div class = "Project">
-                        <h2>Beat 'Em Mop</h2>
-                        <h3>January - April 2024</h3>
-                        <div class = "OutLink">
-                            <a href = "https://goldenlantergames.itch.io/beat-em-mop"><img src = "img/itch-logo.png"class = "link-img"><p>itch.io</p></a>
+                    
+                
+                <!--BEAT EM MOP-->
+                <div class = "Project">
+                    <h2>Beat 'Em Mop</h2>
+                    <h3>January - April 2024</h3>
+                    <div class = "OutLink">
+                        <a href = "https://goldenlantergames.itch.io/beat-em-mop"><img src = "img/itch-logo.png"class = "link-img"><p>itch.io</p></a>
+                    </div>
+                    <hr>
+                    <div class = "Row">
+                        <div class = "Left">
+                            <img src="img/BeatEmMop_Cover.png" alt="Cover Image" class = "image">
                         </div>
-                        <hr>
-                        <div class = "Row">
-                            <div class = "Left"><img src="img/BeatEmMop_Cover.png" alt="Cover Image" class = "image"></div>
-                            <div class = "Right"><p>Beat Em Mop is a 2D arcade style fighting game where you play as the janitor who has had enough of his
+                        <div class = "Right">
+                            <p>Beat Em Mop is a 2D arcade style fighting game where you play as the janitor who has had enough of his
                             job and decides to take out his rage on the co-workers around him all while keeping the place spotless.</p>
                             <p>Beat 'Em Mop was developed as part of a 7-person group project over the course of 4 months. I was the
-                            game's programmer and was responsible for coding, implementing assets and managing source control.</p></div>                    
-                        </div>
-                        <hr>
-                        <div class = "Row">
-                            <div class = "Left">
-                                <p>The biggest challenge through the project was the combat system.</p>
-                                <p>
-                                The earliest implementation saw the player simply damage enemies if they were standing in front of him.
-                                This was sufficient for the beginning stages of development.</p>
-                                <p>Once the first pass animations were implemented, a key frame system was developed such that the attack hitbox could be repositioned and resized for each frame.
-                                The hitboxes were then mapped to match the weapon perfectly.</p>
-                                <p>However after the final versions of the animations were developed, it became apperent that this could be improved.
-                                The keyframes were extended farther to provide a more fun and fluid feeling.
-                                </p>
-                            </div>                    
-                            <div class = "Right"><img src="img/BeatEmMop_Attack.png" alt="Cover Image" class = "image"></div>
+                            game's programmer and was responsible for coding, implementing assets and managing source control.</p>
+                        </div>                    
+                    </div>
+                    <hr>
+                    <div class = "Row">
+                        <div class = "Left">
+                            <p>The biggest challenge through the project was the combat system.</p>
+                            <p>
+                            The earliest implementation saw the player simply damage enemies if they were standing in front of him.
+                            This was sufficient for the beginning stages of development.</p>
+                            <p>Once the first pass animations were implemented, a key frame system was developed such that the attack hitbox could be repositioned and resized for each frame.
+                            The hitboxes were then mapped to match the weapon perfectly.</p>
+                            <p>However after the final versions of the animations were developed, it became apperent that this could be improved.
+                            The keyframes were extended farther to provide a more fun and fluid feeling.
+                            </p>
+                        </div>                    
+                        <div class = "Right">
+                            <img src="img/BeatEmMop_Attack.png" alt="Cover Image" class = "image">
                         </div>
                     </div>
+                </div>
                 
-            </div>
 
-    </section>
+
+                <!--Spaceship-->
+                <div class = "Project">
+                    <h2>Spaceship Shooter</h2>
+                    <h3>April 2022</h3>
+                    <div class = "OutLink">
+                        <a href = "files/SpaceshipShooter.zip"><p>SpaceshipShooter.zip</p></a>
+                    </div>
+                    <hr>
+                    <div class = "Row">
+                        <div class = "Left">
+                            <img src = "img/spaceship-1.png" class = "image">
+                        </div>
+                        <div class = "Right">
+                            <h5>Combat System</h5>
+                            <p>Each ship was going to be given a precise collision box made up of multiple rectangles. Once the movement and combat systems had been designed this became an unrealistic goal to complete within the given timeframe. Each rectangle would need to have its position and rotation recalculated each frame and the number of collision checks to be performed each frame would be unmanageable. Instead each ship was a given a bounding circle. The position was static and the rotation was (obviously) irrelevant. If I were to make something similar now, I would implement a Bounding Volume Hierarchy which would keep the number of collision checks low while allowing for greater accuracy.</p>
+                        </div>  
+                    </div>
+                    <div class = "Row">
+                        <div class = "Left">
+                            <img src = "img/spaceship-1.png" class = "image">
+                        </div>
+                        <div class = "Right">
+                            <h5>Movement System</h5>
+                            <p>The first iteration had the player control the angle of the ship directly, turning instantly on key press. This movement was passable but felt too snappy and did not make the ship appear as though it were in a vaccuum</p>
+                            <p>In an attempt to solve this the second iteration saw the player control the throttle and angle of the engine instead. The game would then calculate the new velocity of the craft according to the effect the engine should have. This involved a large redesign of some core components of the game as well as modifying art assets so that the ship and engine were seperate sprites but effectively made the ship behave more realisticly. This new system was hard to understand as a player. Controlling the ships speed through acceleration was close to impossible and the ship would be unable to turn at low speeds due to having less angular momentum which was completely unintuitive.</p>
+                            <p>The final version of movement involved a blend of the two sytems where the player would control the engine directly but the movement of the ship was not wholey based on physics. If the engine is full throttle, facing right then the ship turns quickly to the right.</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!--ARDUINO-->
+                <div class = "Project">
+                    <h2>Wemos - Simon Says</h2>
+                    <h3>December 2021</h3>
+                    <hr>
+                    <div class = "Row">
+                        <div class = "Left">
+                            <img src = "img/wemos-1.png" class = "image">
+                        </div>
+                        <div class = "Right">
+                            <p>This was my introduction to working with hardware, something I would like to explore in the future. Here I created a version of the classic "Simon Says" game where a sequence of lights will flash and the user must repeat the same pattern back.</p>
+                            <p>The rotary encoder was used to change the difficulty of the game, making the duration that the lights flash shorter at higher levels. Each light was also given a note to play when flashing to help distinguish between them.</p>
+                            <p>This was one of my first projects using C++ and it shows. Many code blocks are inefficient and poorly structured. The entire thing is also written in a single <a href="files/wemos-source.txt">text</a> file making it very difficult to read.</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </section>
 
     <section id ="contact">
         <div class = "Container">
